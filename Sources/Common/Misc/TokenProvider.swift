@@ -1,23 +1,15 @@
 import Foundation
-import Combine
 
-public protocol TokenPublisher {
-    /**
-     Издатель `access` токена.
-     */
-    var accessPublisher: AnyPublisher<String?, Never> { get }
-    
-    /**
-     Издатель `refresh` токена.
-     */
-    var refreshPublisher: AnyPublisher<String?, Never> { get }
+public protocol TokenProvider {
+    var accessToken  : String? { get }
+    var refreshToken : String? { get }
     
     /**
      Функция предоставляет возможность сконфигурировать
-     `TokenPublisher`.
+     `TokenProvider`.
      
      Функция будет вызвана сразу после инциализации класса
-     `TokenPublisher`, используйте её как функцию для нужных
+     `TokenProvider`, используйте её как функцию для нужных
      конфигураций класса.
      */
     func setUp() -> ()
@@ -35,8 +27,6 @@ public protocol TokenPublisher {
     func refresh(completion: @escaping (Bool) -> ()) -> ()
 }
 
-extension TokenPublisher {
-    
-    public func setUp() -> () { }
-    
+public extension TokenProvider {
+    func setUp() -> () { }
 }

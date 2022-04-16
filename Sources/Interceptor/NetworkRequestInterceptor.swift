@@ -34,6 +34,25 @@ final public class NetworkRequestInterceptor: RequestInterceptor {
     }
     
     /**
+     Функция, которая пытается обновить токен.
+     
+     - Parameters:
+         - request: Запрос, который спровоцировал запрос токена.
+         - completion: Замыкание, которое возвращает результат обновления.
+     */
+    private func refresh(with request: Request, using tokenProvider: TokenProvider, completion: @escaping RetryHandler) -> () {
+        guard request.retryCount < self.retryLimit else { return completion(.doNotRetry) }
+        
+        tokenProvider.refresh { isSuccess in
+            if isSuccess {
+                return completion(.retryWithDelay(self.retryInterval))
+            }
+            
+            completion(.doNotRetry)
+        }
+    }
+    
+    /**
      Функция для изменения сетевого запроса, которая вызывается
      перед каждым его совершением.
      
@@ -51,5 +70,30 @@ final public class NetworkRequestInterceptor: RequestInterceptor {
         request.httpBody = self.endpoint.body
         
         completion(.success(request))
+    }
+    
+    /**
+     Функция, определяющая нужно ли попробовать
+     сделать запрос еще раз.
+     
+     - Parameters:
+         - request: Запрос, который спровоцировал ошибку.
+         - session: Сессия, на котором был совершен запрос.
+         - error: Ошибка, пришедшая после выполнения запроса.
+         - completion: Замыкание, которое определяет нужно ли повторить еще раз.
+     */
+    public func retry(_ request: Request, for session: Session, dueTo error: Error, completion: @escaping RetryHandler) {
+        guard
+            let statusCode = request.response?.statusCode,
+            let tokenProvider = NetworkKit.tokenProvider
+        else {
+            return completion(.doNotRetry)
+        }
+        
+        if statusCode == 401 {
+            return self.refresh(with: request, using: tokenProvider, completion: completion)
+        }
+        
+        completion(.doNotRetryWithError(error))
     }
 }
