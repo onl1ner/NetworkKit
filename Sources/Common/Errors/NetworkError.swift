@@ -6,23 +6,16 @@ import Alamofire
  и детальное сообщение пользователю.
  */
 public class NetworkError: Error {
-    
     public let title: String
     public let message: String
     
-    public let style: NetworkErrorStyle
-    
-    public init(title: String, message: String, style: NetworkErrorStyle = .inline) {
+    public init(title: String, message: String) {
         self.title = title
         self.message = message
-        
-        self.style = style
     }
-    
 }
 
 extension NetworkError {
-    
     public static var unknown: NetworkError {
         return .init(title: "Ошибка", message: "Произошла непредвиденная ошибка, попробуйте еще раз.")
     }
@@ -34,5 +27,4 @@ extension NetworkError {
     public static var network: NetworkError {
         return .init(title: "Ошибка сети", message: "Произошла ошибка сети, проверьте свое подключение.")
     }
-    
 }
