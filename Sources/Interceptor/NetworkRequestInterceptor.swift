@@ -30,6 +30,10 @@ final public class NetworkRequestInterceptor: RequestInterceptor {
         headers["Content-Type"] = self.endpoint.contentType.rawValue
         headers["Accept-Type"] = self.endpoint.acceptType.rawValue
         
+        if self.endpoint.authorization != .none, let token = NetworkKit.tokenProvider?.accessToken {
+            headers["Authorization"] = "\(self.endpoint.authorization.rawValue) \(token)"
+        }
+        
         return headers
     }
     
