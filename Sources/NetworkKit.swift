@@ -1,6 +1,6 @@
 import Foundation
 
-final class NetworkKit {
+public final class NetworkKit {
     static private(set) var tokenProvider: TokenProvider?
     
     public static func set(tokenProvider: TokenProvider?) {
